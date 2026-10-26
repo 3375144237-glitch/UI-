@@ -2,8 +2,8 @@
 __pycache__/
 *.pyc
 .DS_Store
-output/*
-!output/.gitkeep
+outputs/*
+!outputs/.gitkeep
 screenshots/device/*
 !screenshots/device/.gitkeep
 screenshots/design/*

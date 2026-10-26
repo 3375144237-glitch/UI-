@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "page_group": "P01",
+  "page": "首页-单词快拼1",
+  "device": "IOS",
+  "mode": "PX",
+  "review_status": "部分验收；含已确认问题和待确认项",
+  "coordinate_unit": "设备原始截图 @2x 像素坐标",
+  "design": {
+    "source_name": "1-3631.png",
+    "original": "inputs/design-original.png",
+    "size": [720, 2156],
+    "page_title": "首页-单词快拼1"
+  },
+  "device_image": {
+    "source_name": "IMG_1296 1.png",
+    "original": "inputs/device-original.png",
+    "size": [828, 1792]
+  },
+  "normalization": {
+    "mode": "PX",
+    "source_size": [828, 1792],
+    "prepared_size": [828, 1792],
+    "scale": 1,
+    "rule": "用户确认设备截图已为IOS原生2倍图，保留原尺寸；按相同左侧边距和局部锚点对照不同宽度画板"
+  },
+  "comparison_note": "设计画板宽720px，设备截图宽828px。未缩放或拉伸设备图；没有对两张不同尺寸的图执行全页像素差分。",
+  "findings": [
+    {
+      "id": "P01-01",
+      "page_group": "P01",
+      "device": "IOS",
+      "category": "位置/周围间距",
+      "description": "日历卡、单词快拼主卡和活动卡内容区均比设计稿下移约12px；活动卡后工具区起点比设计稿下移约24px。",
+      "priority": "P0",
+      "status": "待修复",
+      "bbox": {"x": 32, "y": 192, "width": 764, "height": 223},
+      "design_basis": "设计稿日历卡顶部约y=180px；单词快拼主卡顶部约y=436px；活动卡顶部约y=1136px；工具区顶部约y=1476px。",
+      "expected": "内容区与设计稿保持一致；日历卡和后续主卡纵向锚点应与设计稿相符。",
+      "actual": "设备截图对应锚点约为y=192px、448px、1148px、1500px。",
+      "measurement": "日历、主卡、活动卡起点约+12px；工具区起点约+24px；均超过4px。坐标为原图像素测量。",
+      "recommendation": "检查顶部内容区的垂直间距和活动卡后的模块间距；保持设备截图原比例复核。",
+      "evidence": "evidence/P01-01-position.png"
+    },
+    {
+      "id": "P01-02",
+      "page_group": "P01",
+      "device": "IOS",
+      "category": "多余元素/遮挡",
+      "description": "活动卡片上多出黑色“测试”悬浮控件，遮挡“打卡进度”文案并盖住进度条末端。",
+      "priority": "P0",
+      "status": "待修复",
+      "bbox": {"x": 640, "y": 1362, "width": 164, "height": 76},
+      "design_basis": "设计稿活动卡只有进度条和“打卡进度”标签，没有黑色测试悬浮控件。",
+      "expected": "活动进度文案与进度条完整可见，不被额外控件覆盖。",
+      "actual": "黑色控件覆盖标签左段及进度条右侧区域。",
+      "measurement": "遮挡范围 bbox 为 x640、y1362、宽164、高76，单位为设备原始截图@2x像素。",
+      "recommendation": "移除验收版不需要的测试悬浮控件，或调整正式控件位置，确保活动信息完整显示。",
+      "evidence": "evidence/P01-02-test-overlay.png"
+    },
+    {
+      "id": "P01-03",
+      "page_group": "P01",
+      "device": "IOS",
+      "category": "插画内容/状态待确认",
+      "description": "吉祥物姿势、表情和装饰与设计稿不同；设计稿为闭眼并带红心，设备截图为睁眼挥手并显示“Hi”。",
+      "priority": "P0",
+      "status": "待确认",
+      "bbox": {"x": 183, "y": 519, "width": 287, "height": 239},
+      "design_basis": "设计稿吉祥物插画区域，见局部对照证据。",
+      "expected": "若此页面要求静态素材一致，应使用设计稿对应插画；若为状态或动画帧变化，需提供对应验收状态。",
+      "actual": "设备截图显示另一种吉祥物姿势及“Hi”装饰。",
+      "measurement": "本项为内容差异，尚不能排除动画帧或业务状态造成。",
+      "recommendation": "请设计/产品确认该插画是否随状态变化；确认应一致后再转为缺陷。",
+      "evidence": "evidence/待确认-吉祥物状态.png"
+    }
+  ],
+  "pending_checks": [
+    "设备主卡已学完/100%/切换教材与设计稿继续新学状态不同，需要确认业务状态是否应相同。",
+    "词王争霸赛活动封面同标题但画面细节和裁切观感不同，需要确认是否为素材变体或裁切差异。",
+    "设备画面只显示工具区标题；工具图标和其余内容未覆盖。",
+    "字体家族、字重、字号和行高未从可编辑Figma文字属性中读取，不能仅凭PNG确定。",
+    "Figma桌面显示存在未同步修改；本轮使用工作区现有导出，远端最新稿待确认。"
+  ]
+}

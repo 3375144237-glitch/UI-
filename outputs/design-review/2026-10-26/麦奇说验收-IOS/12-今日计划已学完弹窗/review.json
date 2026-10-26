@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "page_group": "P12",
+  "page": "今日计划已学完弹窗",
+  "device": "IOS",
+  "mode": "PX",
+  "review_status": "弹窗可见区域已检查；记录4项P0，其中3项待修复、1项待确认；字体与Figma同步版本待确认",
+  "coordinate_unit": "设备原始截图 @2x 像素坐标",
+  "design": {
+    "original": "inputs/design-original.png",
+    "size": [720, 1560],
+    "user_link_node": "89:550",
+    "rendered_dialog_bbox": {"x": 80, "y": 569, "width": 560, "height": 422},
+    "selected_figma_child": {
+      "node": "89:553",
+      "name": "Frame 80",
+      "width": 560,
+      "height": 380,
+      "corner_radius": 32,
+      "layout": "vertical auto-layout",
+      "item_spacing": 40,
+      "padding": {"top": 40, "right": 32, "bottom": 48, "left": 32}
+    },
+    "version_note": "桌面端显示更改尚未同步。Flattened export 可见弹窗边界为560×422px，而所选 Figma 子层 Frame 80 属性为560×380px；弹窗高度问题按可见导出边界测量，准确设计边界仍需确认。"
+  },
+  "device_image": {
+    "source_name": "IMG_1314 1.png",
+    "original": "inputs/device-original.png",
+    "size": [828, 1792],
+    "sha256": "fe9f8c8d8af4cd5ee181e89d6caa02a95db19e9e36a232788b015dffd06ea022"
+  },
+  "normalization": {
+    "mode": "PX",
+    "source_size": [828, 1792],
+    "prepared_size": [828, 1792],
+    "scale": 1,
+    "rule": "用户确认IOS设备截图已为设备原生2倍图，保持原尺寸"
+  },
+  "comparison": {
+    "design_dialog_crop": {"x": 80, "y": 569, "width": 560, "height": 422},
+    "device_dialog_crop": {"x": 134, "y": 667, "width": 560, "height": 458},
+    "alignment": "只裁弹窗；设计与设备弹窗顶边对齐，左右宽度相同，不使用屏幕顶部对齐，也不缩放设备截图",
+    "device_adaptation": "设备视口宽828px；弹窗宽560px、左右边距各134px并居中。该截图只覆盖一个设备宽度。"
+  },
+  "checks": [
+    {"item": "弹窗及按钮缺失", "result": "未发现", "detail": "标题、正文和两个操作按钮均可见；弹窗内无独立 icon。"},
+    {"item": "弹窗宽度与居中", "result": "当前视口符合", "detail": "设计与设备可见弹窗均宽560px；设备截图左右边距各134px。"},
+    {"item": "弹窗高度", "result": "P0待确认", "detail": "可见导出边界高度422px，设备白色弹窗高度458px；差约36px。Figma可编辑子层高度为380px，精确边界需设计确认。"},
+    {"item": "圆角与按钮外观", "result": "目测一致", "detail": "Figma Frame 80 圆角32px；设备弹窗和两枚按钮的轮廓、颜色及尺寸未见明显差异。"},
+    {"item": "固定文案", "result": "P0问题", "detail": "正文内容被改写，详见 P12-01。"},
+    {"item": "正文颜色", "result": "P0问题", "detail": "设计稿主要实色像素 RGB(98,100,102)，设备 RGB(158,161,164)。"},
+    {"item": "文字字体属性", "result": "待确认", "detail": "当前可读到 Figma 子层布局属性，尚未读到文字层 Typography 字体家族、字号、字重及行高。"}
+  ],
+  "findings": [
+    {
+      "id": "P12-01",
+      "page_group": "P12",
+      "device": "IOS",
+      "category": "固定文案",
+      "description": "【页面 P12 今日计划已学完弹窗】正文固定文案与设计稿不一致，整段内容被改写。",
+      "priority": "P0",
+      "status": "待修复",
+      "bbox": {"x": 192, "y": 808, "width": 446, "height": 91},
+      "design_bbox": {"x": 120, "y": 695, "width": 480, "height": 116},
+      "expected": "今日新词任务已完成。你还可以回顾历史单词巩固记忆，或进入单元学查看教材中的更多内容。",
+      "actual": "你今天的新学单词都已完成，可回顾历史单词巩固记忆，或前往单元学查看更多内容。",
+      "measurement": "固定正文两处措辞替换且部分内容删减；两边均为三行。",
+      "recommendation": "按设计稿恢复固定正文，并复核相同宽度下的换行。",
+      "evidence": "evidence/P12-01-copy.png"
+    },
+    {
+      "id": "P12-02",
+      "page_group": "P12",
+      "device": "IOS",
+      "category": "弹窗尺寸",
+      "description": "【页面 P12 今日计划已学完弹窗】设备弹窗可见高度比设计导出图多约36px；Figma子层尺寸与导出可见边界不一致，待确认设计边界后定修复值。",
+      "priority": "P0",
+      "status": "待确认",
+      "bbox": {"x": 134, "y": 667, "width": 560, "height": 458},
+      "design_bbox": {"x": 80, "y": 569, "width": 560, "height": 422},
+      "expected": "弹窗与经确认的Figma设计边界一致；当前扁平导出可见外框为560×422px。",
+      "actual": "设备截图可见白色弹窗为560×458px。",
+      "measurement": "按可见截图边界测量，高度多约36px，宽度相同。当前可读 Figma 子层 Frame 80 为560×380px、圆角32px；需确认导出图外框与可编辑子层的边界关系。",
+      "recommendation": "先确认 Figma 中 Frame 80 与导出图可见弹窗外框的对应关系，再以确定后的尺寸调整设备弹窗高度。",
+      "evidence": "evidence/P12-02-dialog-height.png"
+    },
+    {
+      "id": "P12-03",
+      "page_group": "P12",
+      "device": "IOS",
+      "category": "正文颜色",
+      "description": "【页面 P12 今日计划已学完弹窗】设备正文颜色明显浅于设计稿。",
+      "priority": "P0",
+      "status": "待修复",
+      "bbox": {"x": 192, "y": 808, "width": 446, "height": 91},
+      "design_bbox": {"x": 120, "y": 695, "width": 480, "height": 116},
+      "expected": "正文颜色与设计稿保持一致。",
+      "actual": "正文灰色明显偏浅。",
+      "measurement": "从两张PNG正文区域采样，设计稿主要实色像素约RGB(98,100,102)，设备约RGB(158,161,164)；数值来自扁平截图，不代表源码Token。",
+      "recommendation": "核对正文文字颜色或透明度，并从Figma文字样式/变量确认目标值。",
+      "evidence": "evidence/P12-03-body-color.png"
+    },
+    {
+      "id": "P12-04",
+      "page_group": "P12",
+      "device": "IOS",
+      "category": "位置/周围间距",
+      "description": "【页面 P12 今日计划已学完弹窗】按弹窗顶边对齐后，设备标题、正文行距及按钮组的纵向位置与设计稿不一致。",
+      "priority": "P0",
+      "status": "待修复",
+      "bbox": {"x": 155, "y": 727, "width": 518, "height": 350},
+      "design_bbox": {"x": 100, "y": 603, "width": 520, "height": 340},
+      "expected": "标题、正文行距、正文与按钮间距按设计稿垂直布局。",
+      "actual": "标题约下移27px，正文首行约下移15px；正文末行约上移9px；按钮组约下移37px。",
+      "measurement": "正文行距较设计稿紧约10px/行，正文末行到按钮顶部的空隙增加约46px；差异超过4px。位置以可见弹窗顶边对齐后估算。",
+      "recommendation": "分别核对标题上边距、正文行高/行距、正文与按钮组间距，不以整体移动掩盖内部间距差异。",
+      "evidence": "evidence/P12-04-vertical-layout.png"
+    }
+  ],
+  "pending_checks": [
+    "Figma桌面端存在未同步提示，远端最新内容未确认；本轮只记录本机可见页面/属性和工作区设计导出。",
+    "Figma子层Frame 80属性560×380px，与导出图可见弹窗边界560×422px不同；需设计确认弹窗外框的权威边界。",
+    "正文字体家族、字重、字号及行高尚未从Typography属性确认；不得据PNG猜测字体名或源码字号。",
+    "单张828px宽设备截图只能检查当前视口的适配与居中，无法验证其他设备宽度。"
+  ]
+}
