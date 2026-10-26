@@ -2,6 +2,8 @@
 
 本项目根据 Figma 设计稿和设备截图做静态 UI 验收，输出逐项问题证据、Markdown 汇总和可编辑表格。像素差异只提供线索，必须人工逐项确认。
 
+核心 Skill：[`ui-design-review`](.agents/skills/ui-design-review/SKILL.md)
+
 ## 验收前
 
 - 先阅读工作区 `问题与报错日志.md` 和 `.agents/skills/ui-design-review/SKILL.md`。
