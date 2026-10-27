@@ -47,6 +47,17 @@
 
 每条问题在 `review.json` 中填写稳定 ID、原始设备截图 @2x `bbox`、类别、描述、设计依据、预期、实际、测量和建议。问题证据必须同时包含设计区域、同源设备原图裁片和移动后的红色 50% 对位图。
 
+## 证据辅助脚本
+
+脚本只使用仓库已声明的 Pillow、openpyxl 依赖，不需要 `@oai/artifact-tool`。先运行 `python -m pip install -r requirements.txt`，再用当前 Python 环境运行：
+
+```bash
+python scripts/label_evidence_header.py --input evidence/P15-04.png --output evidence/P15-04-labeled.png --label "P15-04 正文至按钮组间距，设计稿40px、设备截图约94px，相差约54px"
+python scripts/add_review_note.py --workbook report.xlsx --sheet 验收记录 --cell F6 --note "设计稿正确间距见附图。" --image evidence/design-devmode-spacing.png --image-cell F7 --max-width-px 280 --output report-with-note.xlsx
+```
+
+标题脚本会在证据图上方新增标题条，不覆盖原图内容；工作簿脚本只写入新 `.xlsx` 副本，备注文字和图片位置都可按本轮表格调整。两个脚本都接受本机路径，不依赖本项目的 `outputs/` 或某台设备的文件名；中文字体可通过 `--font` 指定。
+
 表格记录使用设备分类 `IOS`、`安卓`、`鸿蒙`、`PAD`、`PC`；问题ID列按用户要求不展示，备注未要求时留空。Excel、JSON 和 Markdown 的问题数量、来源截图、bbox 和状态必须一致。无明确差异、待确认和未处理截图都要单独记录。
 
 ## 验证
