@@ -271,6 +271,63 @@ class WorkbookTests(unittest.TestCase):
             self.assertEqual(updated.cell(2, 5).value, "修复中")
             self.assertEqual(updated.cell(2, 6).value, "保留备注")
 
+    def test_batch_report_groups_confirmed_issue_across_devices(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "batch"
+            sessions = [root / "01-ios", root / "02-android"]
+            for index, (session, device) in enumerate(zip(sessions, ("IOS", "安卓")), 1):
+                session.mkdir(parents=True)
+                Image.new("RGB", (720, 240), "white").save(session / "device-prepared.png")
+                review = {
+                    "schema_version": 1,
+                    "page": "首页/默认态",
+                    "device": device,
+                    "design": {"source_name": "home.png"},
+                    "device_image": {
+                        "prepared": "device-prepared.png",
+                        "source_name": f"device-{index}.png",
+                    },
+                    "findings": [{
+                        "id": f"local-{index}",
+                        "shared_issue_id": "P01-01",
+                        "description": "按钮间距不一致",
+                        "priority": "P0",
+                        "status": "待修复",
+                        "bbox": {"x": 20, "y": 30, "width": 40, "height": 20},
+                    }],
+                }
+                (session / "review.json").write_text(json.dumps(review, ensure_ascii=False), encoding="utf-8")
+
+            report = ui_review.generate_batch_report(root)
+            workbook = load_workbook(report)
+            sheet = workbook["验收记录"]
+            self.assertEqual(sheet.max_row, 2)
+            self.assertEqual(sheet.cell(2, 1).value, "IOS、安卓")
+            self.assertEqual(sheet.cell(2, 3).value,
+                             "[P01-01] 按钮间距不一致 · 来源截图：01-ios/device-1.png、02-android/device-2.png")
+            self.assertEqual(sheet.cell(2, 7).value, "shared::P01-01")
+            self.assertEqual(len(sheet._images), 1)
+            details = workbook["问题详情"]
+            self.assertEqual(details.max_row, 3)
+            self.assertEqual([details.cell(row, 2).value for row in (2, 3)], ["P01-01", "P01-01"])
+            self.assertEqual([details.cell(row, 3).value for row in (2, 3)], ["IOS", "安卓"])
+            self.assertEqual([details.cell(row, 13).value for row in (2, 3)], ["20, 30, 40, 20"] * 2)
+            self.assertTrue(all((root / details.cell(row, 14).value).is_file() for row in (2, 3)))
+            self.assertEqual(workbook["截图清单"].max_row, 3)
+
+            sheet.cell(2, 6, "保留人工备注")
+            workbook.save(report)
+            regenerated = load_workbook(ui_review.generate_batch_report(root))["验收记录"]
+            self.assertEqual(regenerated.cell(2, 6).value, "保留人工备注")
+
+            second_review_path = sessions[1] / "review.json"
+            second_review = json.loads(second_review_path.read_text(encoding="utf-8"))
+            second_review["findings"][0]["description"] = "另一个问题"
+            second_review_path.write_text(json.dumps(second_review, ensure_ascii=False), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "共享问题 P01-01"):
+                ui_review.generate_batch_report(root)
+            self.assertEqual(load_workbook(report)["验收记录"].cell(2, 6).value, "保留人工备注")
+
 
 class WorkflowTests(unittest.TestCase):
     def test_compare_command_preserves_sources_and_generates_report(self):

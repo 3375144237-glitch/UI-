@@ -598,7 +598,7 @@ def generate_report(session: Path, review: dict[str, Any], previous_report: str 
 
 
 def generate_batch_report(batch_root: Path, destination: Path | None = None) -> Path:
-    """Combine issue rows from a batch while retaining one evidence image per source screenshot."""
+    """Combine confirmed shared issues while retaining evidence for each screenshot."""
     batch_root = batch_root.resolve()
     if not batch_root.is_dir():
         raise ValueError(f"批次目录不存在：{batch_root}")
@@ -634,6 +634,7 @@ def generate_batch_report(batch_root: Path, destination: Path | None = None) -> 
     coverage.append(["序号", "设备", "来源设备截图", "页面/可见状态", "对应设计稿", "已登记问题数", "验收状态", "并排对照图", "红色叠图", "验收目录", "备注"])
 
     row = 2
+    shared_rows: dict[str, dict[str, Any]] = {}
     represented_sources: set[int] = set()
     for review_path in review_paths:
         session = review_path.parent.resolve()
@@ -681,44 +682,65 @@ def generate_batch_report(batch_root: Path, destination: Path | None = None) -> 
         crops_dir = session / "evidence" / "crops"
         for index, finding in enumerate(findings, 1):
             issue_id = str(finding.get("id") or f"M-{index:03d}")
-            record_key = f"{session_key}::{issue_id}"
+            shared_issue_id = str(finding.get("shared_issue_id") or "").strip()
+            display_id = shared_issue_id or issue_id
+            local_record_key = f"{session_key}::{issue_id}"
+            record_key = f"shared::{shared_issue_id}" if shared_issue_id else local_record_key
             crop_path = crops_dir / f"{index:03d}-{hashlib.sha1(issue_id.encode('utf-8')).hexdigest()[:8]}.jpg"
-            crop_annotated(device_image, finding.get("bbox") or finding.get("device_bbox"), issue_id, crop_path)
+            crop_annotated(device_image, finding.get("bbox") or finding.get("device_bbox"), display_id, crop_path)
 
-            page_group = finding.get("page_group") or issue_id.split("-", 1)[0]
+            page_group = finding.get("page_group") or display_id.split("-", 1)[0]
             page = finding.get("page_state") or review.get("page", "")
-            description = str(finding.get("description") or "待填写问题描述")
-            if issue_id not in description:
-                description = f"[{issue_id}] {description}"
+            source_description = str(finding.get("description") or "待填写问题描述")
             values = {
-                "description": description,
+                "description": source_description,
                 "priority": finding.get("priority") or "待评估",
                 "status": finding.get("status") or "待确认",
                 "remarks": finding.get("remarks") or "",
             }
             values.update(session_fields.get(issue_id, {}))
-            values.update(previous.get(record_key, {}))
+            values.update(previous.get(record_key, previous.get(local_record_key, {})))
             description = re.sub(r"\s*· 来源截图：.*$", "", str(values["description"]))
-            prefix_pattern = re.compile(r"^\[" + re.escape(issue_id) + r"(?: · [^\]]*)?\]\s*")
-            while prefix_pattern.match(description):
-                description = prefix_pattern.sub("", description, count=1)
-            sheet.cell(row, 1, finding.get("device") or review.get("device") or "待填写")
-            sheet.cell(row, 3, f"[{issue_id}] {description} · 来源截图：{source_name}")
-            sheet.cell(row, 4, values["priority"])
-            sheet.cell(row, 5, values["status"])
-            sheet.cell(row, 6, values["remarks"])
-            sheet.cell(row, 7, record_key)
-            embedded = SheetImage(str(crop_path))
-            scale = min(190 / embedded.width, 140 / embedded.height, 1.0)
-            embedded.width = max(1, int(embedded.width * scale))
-            embedded.height = max(1, int(embedded.height * scale))
-            sheet.add_image(embedded, f"B{row}")
-            sheet.row_dimensions[row].height = 108
+            for labeled_id in (issue_id, display_id):
+                prefix_pattern = re.compile(r"^\[" + re.escape(labeled_id) + r"(?: · [^\]]*)?\]\s*")
+                while prefix_pattern.match(description):
+                    description = prefix_pattern.sub("", description, count=1)
+            values["description"] = description
+            device_name = finding.get("device") or review.get("device") or "待填写"
+            if shared_issue_id and record_key in shared_rows:
+                grouped = shared_rows[record_key]
+                if grouped["source_description"] != source_description or grouped["values"] != values:
+                    raise ValueError(f"共享问题 {shared_issue_id} 的描述、优先级、状态或备注不一致，请先核对。")
+                if device_name not in grouped["devices"]:
+                    grouped["devices"].append(device_name)
+                if source_name not in grouped["sources"]:
+                    grouped["sources"].append(source_name)
+                sheet.cell(grouped["row"], 1, "、".join(grouped["devices"]))
+                sheet.cell(grouped["row"], 3, f"[{display_id}] {description} · 来源截图：{'、'.join(grouped['sources'])}")
+            else:
+                sheet.cell(row, 1, device_name)
+                sheet.cell(row, 3, f"[{display_id}] {description} · 来源截图：{source_name}")
+                sheet.cell(row, 4, values["priority"])
+                sheet.cell(row, 5, values["status"])
+                sheet.cell(row, 6, values["remarks"])
+                sheet.cell(row, 7, record_key)
+                embedded = SheetImage(str(crop_path))
+                scale = min(190 / embedded.width, 140 / embedded.height, 1.0)
+                embedded.width = max(1, int(embedded.width * scale))
+                embedded.height = max(1, int(embedded.height * scale))
+                sheet.add_image(embedded, f"B{row}")
+                sheet.row_dimensions[row].height = 108
+                if shared_issue_id:
+                    shared_rows[record_key] = {
+                        "row": row, "devices": [device_name], "sources": [source_name],
+                        "source_description": source_description, "values": values,
+                    }
+                row += 1
 
             bbox = finding.get("bbox") or finding.get("device_bbox") or {}
             detail.append([
                 page_group,
-                issue_id,
+                display_id,
                 finding.get("device") or review.get("device") or "待填写",
                 page,
                 source_name,
@@ -733,7 +755,6 @@ def generate_batch_report(batch_root: Path, destination: Path | None = None) -> 
                 crop_path.relative_to(batch_root).as_posix(),
                 session_key,
             ])
-            row += 1
 
     for sequence, (source_file, design_ref, status, note) in sorted(progress_sources.items()):
         if sequence in represented_sources:
